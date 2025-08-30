@@ -326,22 +326,19 @@ void MapXYToLatLon(double x, double y, double lambda0, double *phi, double *lamb
 // Inputs:
 //   lat - Latitude of the point, in radians.
 //   lon - Longitude of the point, in radians.
-//   zone - UTM zone to be used for calculating values for x and y.
-//          If zone is less than 1 or greater than 60, the routine
-//          will determine the appropriate zone from the value of lon.
 //
 // Outputs:
 //   x - The x coordinate (easting) of the computed point. (in meters)
 //   y - The y coordinate (northing) of the computed point. (in meters)
+//   zone - UTM zone to be used for calculating values for x and y.
 //
 // Returns:
 //   The UTM zone used for calculating the values of x and y.
-int LatLonZoneToUTMXY(double lat, double lon, int zone, double *x, double *y)
+void LatLonToUTMXY(double lat, double lon, double *x, double *y, int* zone)
 {
-    if ((zone < 1) || (zone > 60))
-        zone = floor((lon + 180.0) / 6) + 1;
+    *zone = floor((lon + 180.0) / 6) + 1;
 
-    MapLatLonToXY(lat * deg_to_rad, lon * deg_to_rad, UTMCentralMeridian(zone), x, y);
+    MapLatLonToXY(lat * deg_to_rad, lon * deg_to_rad, UTMCentralMeridian(*zone), x, y);
 
     /* Adjust easting and northing for UTM system. */
     *x = *x * UTMScaleFactor + 500000.0;
@@ -349,26 +346,7 @@ int LatLonZoneToUTMXY(double lat, double lon, int zone, double *x, double *y)
     if (*y < 0.0)
         *y += 10000000.0;
 
-    return zone;
-}
-
-// LatLonToUTMXY
-// Converts a latitude/longitude pair to x, y coordinates and zone in the
-// Universal Transverse Mercator projection.
-// Inputs:
-//   lat - Latitude of the point, in degree.
-//   lon - Longitude of the point, in degree.
-// Outputs:
-//   x - The x coordinate (easting) of the computed point. (in meters)
-//   y - The y coordinate (northing) of the computed point. (in meters)
-//   zone - UTM zone to be used for calculating values for x and y.
-//          The routine will determine the appropriate zone from the value of lon.
-// Returns:
-// The function does not return a value.
-void LatLonToUTMXY(double lat, double lon, double *x, double *y, int *zone)
-{
-    *zone = floor((lon + 180.0) / 6) + 1;
-    LatLonZoneToUTMXY(lat, lon, *zone, x, y);
+    return;
 }
 
 // UTMXYToLatLon
